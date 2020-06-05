@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'components/ProfileImageButton.dart';
+import 'src/components/profile_image_button.dart';
 
 void main() => runApp(App());
 
