@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:tutorial_app_wk1/src/components/main_page.dart';
+import 'package:tutorial_app_wk1/src/providers/environment_provider.dart';
 import 'package:tutorial_app_wk1/src/store/application_store.dart';
 
 class App extends StatelessWidget {
@@ -11,9 +12,9 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StoreProvider<RootState>(
+    return EnvironmentProvider.fromDotEnv(StoreProvider<RootState>(
         store: store,
         child:
-            MaterialApp(home: MainPage(), debugShowCheckedModeBanner: false));
+            MaterialApp(home: MainPage(), debugShowCheckedModeBanner: false)));
   }
 }
