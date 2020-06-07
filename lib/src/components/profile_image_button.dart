@@ -1,8 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:tutorial_app_wk1/src/store/application_store.dart';
-import 'package:tutorial_app_wk1/src/store/modules/contact.dart';
 
 class _BackgroundContainer extends StatelessWidget {
   final double size;
@@ -52,23 +49,18 @@ class ProfileImageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<RootState, VoidCallback>(
-        converter: (store) =>
-            () => store.dispatch(SetContactAction(contacts: [])),
-        builder: (context, setContact) => FlatButton(
-            child: Stack(
-                alignment: AlignmentDirectional.center,
-                children: <Widget>[
-                  _BackgroundContainer(
-                    size: size,
-                  ),
-                  Icon(Icons.camera_alt, size: 30, color: Colors.white)
-                ]),
-            color: Colors.transparent,
-            hoverColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            splashColor: Colors.transparent,
-            onPressed: setContact));
+    return FlatButton(
+        child: Stack(alignment: AlignmentDirectional.center, children: <Widget>[
+          _BackgroundContainer(
+            size: size,
+          ),
+          Icon(Icons.camera_alt, size: 30, color: Colors.white)
+        ]),
+        color: Colors.transparent,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        onPressed: () => {});
   }
 }

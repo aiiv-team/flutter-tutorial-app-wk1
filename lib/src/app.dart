@@ -1,20 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:tutorial_app_wk1/src/components/main_page.dart';
+import 'package:tutorial_app_wk1/src/components/profile_page.dart';
 import 'package:tutorial_app_wk1/src/providers/environment_provider.dart';
 import 'package:tutorial_app_wk1/src/store/application_store.dart';
 
-class App extends StatelessWidget {
-  final Store<RootState> store = getStore();
-
+class App extends StatefulWidget {
   App({Key key}) : super(key: key);
+
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  int _selectedPageIndex = 0;
+  final List<Widget> _pages = <Widget>[
+    ProfilePage(),
+    Text('Gallery'),
+    Text('Stories'),
+  ];
+  final List<BottomNavigationBarItem> _navItems = <BottomNavigationBarItem>[
+    BottomNavigationBarItem(icon: Icon(Icons.phone), title: Text('연락처')),
+    BottomNavigationBarItem(icon: Icon(Icons.image), title: Text('갤러리')),
+    BottomNavigationBarItem(icon: Icon(Icons.thumb_up), title: Text('스토리'))
+  ];
+  final Store<RootState> _store = getStore();
 
   @override
   Widget build(BuildContext context) {
     return EnvironmentProvider.fromDotEnv(StoreProvider<RootState>(
-        store: store,
-        child:
-            MaterialApp(home: MainPage(), debugShowCheckedModeBanner: false)));
+        store: _store,
+        child: MaterialApp(
+            home: Scaffold(
+              body: Center(child: _pages[_selectedPageIndex]),
+              bottomNavigationBar: BottomNavigationBar(
+                  items: _navItems,
+                  currentIndex: _selectedPageIndex,
+                  selectedItemColor: Colors.teal.shade400,
+                  selectedFontSize: 12,
+                  onTap: _setPage),
+            ),
+            debugShowCheckedModeBanner: false)));
+  }
+
+  void _setPage(int index) {
+    setState(() {
+      _selectedPageIndex = index;
+    });
   }
 }
