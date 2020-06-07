@@ -1,16 +1,15 @@
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:redux/redux.dart';
-import 'package:tutorial_app_wk1/src/store/modules/contact.dart';
+import 'package:tutorial_app_wk1/src/store/modules/profile.dart';
 
 class RootState {
-  final List<Contact> contact;
+  final ProfileState profile;
 
-  RootState({@required this.contact});
+  RootState({@required this.profile});
 }
 
 RootState _combinedReducer(RootState state, action) =>
-    new RootState(contact: contactReducer(state.contact, action));
+    new RootState(profile: contactReducer(state.profile, action));
 
 Store<RootState> getStore() => new Store<RootState>(_combinedReducer,
-    initialState: RootState(contact: initialContact), middleware: []);
+    initialState: RootState(profile: initialProfileState), middleware: []);

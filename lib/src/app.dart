@@ -6,8 +6,6 @@ import 'package:tutorial_app_wk1/src/providers/environment_provider.dart';
 import 'package:tutorial_app_wk1/src/store/application_store.dart';
 
 class App extends StatefulWidget {
-  App({Key key}) : super(key: key);
-
   @override
   _AppState createState() => _AppState();
 }
