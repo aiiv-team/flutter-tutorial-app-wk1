@@ -33,7 +33,7 @@ class _MyProfileNameText extends StatelessWidget {
 
   Widget _buildContent(BuildContext context, _MyProfileNameProps props) {
     if (props.name == null || props.name.length == 0) {
-      return Text('여기를 탭하고\n당신의 이름을 입력하세요.',
+      return Text('이름을 입력하세요',
           textAlign: TextAlign.center, style: _namePlaceholderTextStyle);
     }
     return Text(props.name, style: _nameTextStyle);
@@ -90,7 +90,7 @@ class _MyProfileNameState extends State<_MyProfileName> {
           setName: (String name) =>
               store.dispatch(SetMyNameAction(name: name))),
       builder: (context, props) => Container(
-          margin: EdgeInsets.only(top: 24),
+          margin: const EdgeInsets.only(top: 24),
           child: _isEditing
               ? _MyProfileNameTextField(
                   initialValue: props.name,
@@ -116,7 +116,9 @@ class _MyProfileNameState extends State<_MyProfileName> {
 class MyProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[ProfileImageButton(), _MyProfileName()]));
+      child: Container(
+          margin: const EdgeInsets.only(bottom: 48),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[ProfileImageButton(), _MyProfileName()])));
 }

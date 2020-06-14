@@ -1,5 +1,8 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+import 'package:tutorial_app_wk1/src/store/application_store.dart';
 
 class SetContactAction {
   final List<Contact> contacts;
@@ -15,6 +18,13 @@ class ProfileState {
   final List<Contact> contacts;
   final String myName;
   ProfileState({@required this.contacts, @required this.myName});
+}
+
+ThunkAction<RootState> retrieveContacts() {
+  return (Store<RootState> store) async {
+    final contacts = await ContactsService.getContacts();
+    store.dispatch(SetContactAction(contacts: contacts.toList()));
+  };
 }
 
 ProfileState contactReducer(ProfileState state, action) {
