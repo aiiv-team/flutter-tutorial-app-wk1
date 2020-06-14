@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:tutorial_app_wk1/src/components/contact_item.dart';
+import 'package:tutorial_app_wk1/src/lib/misc.dart';
 import 'package:tutorial_app_wk1/src/store/application_store.dart';
 import 'package:tutorial_app_wk1/src/store/modules/profile.dart';
 
@@ -33,6 +32,7 @@ class _ContactsActionButton extends StatelessWidget {
 
 class _ContactsActionBar extends StatelessWidget {
   static const buttonSize = 32.0;
+  static const barSize = 40.0;
 
   final Function retrieveContacts;
 
@@ -40,50 +40,97 @@ class _ContactsActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-      margin: EdgeInsets.only(bottom: 24),
       child: Container(
-          height: buttonSize,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _ContactsActionButton(
-                    tooltipMessage: '검색',
-                    size: buttonSize,
-                    iconData: Icons.search,
-                    onPressed: () {}),
-                Spacer(),
-                _ContactsActionButton(
-                    tooltipMessage: '연락처 추가하기',
-                    size: buttonSize,
-                    iconData: Icons.add,
-                    onPressed: () {}),
-                _ContactsActionButton(
-                    tooltipMessage: '디바이스에 저장된 연락처 불러오기',
-                    size: buttonSize,
-                    iconData: Icons.sync,
-                    onPressed: retrieveContacts),
-                _ContactsActionButton(
-                    tooltipMessage: '연락처 선택',
-                    size: buttonSize,
-                    iconData: Icons.more_vert,
-                    onPressed: () {}),
-              ])));
+          height: barSize,
+          decoration: BoxDecoration(color: Colors.white, boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.1),
+              blurRadius: 4,
+              spreadRadius: 0,
+              offset: Offset(0, 4),
+            )
+          ]),
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    _ContactsActionButton(
+                        tooltipMessage: '검색',
+                        size: buttonSize,
+                        iconData: Icons.search,
+                        onPressed: () {}),
+                    Spacer(),
+                    _ContactsActionButton(
+                        tooltipMessage: '연락처 추가하기',
+                        size: buttonSize,
+                        iconData: Icons.add,
+                        onPressed: () {}),
+                    _ContactsActionButton(
+                        tooltipMessage: '디바이스에 저장된 연락처 불러오기',
+                        size: buttonSize,
+                        iconData: Icons.sync,
+                        onPressed: retrieveContacts),
+                    _ContactsActionButton(
+                        tooltipMessage: '연락처 선택',
+                        size: buttonSize,
+                        iconData: Icons.more_vert,
+                        onPressed: () {}),
+                  ]))));
 }
 
 class _ContactsList extends StatelessWidget {
+  final FetchState contactsFetchState;
   final List<Contact> contacts;
-  _ContactsList({@required this.contacts});
+  final Function retrieveContacts;
+  _ContactsList(
+      {@required this.contactsFetchState,
+      @required this.contacts,
+      @required this.retrieveContacts});
 
   @override
-  Widget build(BuildContext context) => Text(json
-      .encode(this.contacts.map((contact) => contact.displayName).toList()));
+  Widget build(BuildContext context) {
+    switch (contactsFetchState) {
+      case FetchState.Pending:
+        return Center(child: CircularProgressIndicator());
+      case FetchState.Success:
+        return ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children:
+              contacts.map((contact) => ContactItem(contact: contact)).toList(),
+        );
+      case FetchState.PermissionError:
+        return Center(child: Text('주소록에 접근할 권한이 없습니다.'));
+      case FetchState.None:
+      default:
+        return Center(
+            child: FlatButton(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.sync,
+                size: 64,
+                color: Colors.black26,
+              ),
+              Text('연락처 불러오기', style: const TextStyle(color: Colors.black26))
+            ],
+          ),
+          onPressed: retrieveContacts,
+        ));
+    }
+  }
 }
 
 class _ContactsProps {
+  final FetchState contactsFetchState;
   final List<Contact> contacts;
   final Function retrieveContacts;
-  _ContactsProps({@required this.contacts, @required this.retrieveContacts});
+  _ContactsProps(
+      {@required this.contactsFetchState,
+      @required this.contacts,
+      @required this.retrieveContacts});
 }
 
 class Contacts extends StatefulWidget {
@@ -96,40 +143,20 @@ class _ContactsState extends State<Contacts> {
   Widget build(BuildContext context) =>
       StoreConnector<RootState, _ContactsProps>(
           converter: (store) => _ContactsProps(
+              contactsFetchState: store.state.profile.contactsFetchState,
               contacts: store.state.profile.contacts,
               retrieveContacts: () => store.dispatch(retrieveContacts())),
           builder: (context, props) {
-            return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      _ContactsActionBar(
-                          retrieveContacts: _retrieveContacts(props)),
-                      Expanded(
-                          child: _ContactsList(
-                        contacts: props.contacts,
-                      ))
-                    ]));
+            return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _ContactsActionBar(retrieveContacts: props.retrieveContacts),
+                  Expanded(
+                      child: _ContactsList(
+                    contactsFetchState: props.contactsFetchState,
+                    contacts: props.contacts,
+                    retrieveContacts: props.retrieveContacts,
+                  ))
+                ]);
           });
-
-  _retrieveContacts(_ContactsProps props) => () async {
-        PermissionStatus status = await Permission.contacts.status;
-
-        switch (status) {
-          case PermissionStatus.undetermined:
-            if (await Permission.contacts.request().isGranted) {
-              props.retrieveContacts();
-            }
-            break;
-          case PermissionStatus.granted:
-            props.retrieveContacts();
-            break;
-          case PermissionStatus.denied:
-          case PermissionStatus.restricted:
-          case PermissionStatus.permanentlyDenied:
-          default:
-            break;
-        }
-      };
 }
