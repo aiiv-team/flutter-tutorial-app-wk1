@@ -15,13 +15,10 @@ class _AppState extends State<App> {
   final List<Widget> _pages = <Widget>[
     ProfilePage(),
     Text('Gallery'),
-    Text('Feed'),
   ];
   final List<BottomNavigationBarItem> _navItems = <BottomNavigationBarItem>[
     BottomNavigationBarItem(icon: Icon(Icons.phone), title: Text('연락처')),
     BottomNavigationBarItem(icon: Icon(Icons.image), title: Text('갤러리')),
-    BottomNavigationBarItem(
-        icon: Icon(Icons.featured_play_list), title: Text('피드'))
   ];
   final Store<RootState> _store = getStore();
 

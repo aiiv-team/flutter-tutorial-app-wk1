@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tutorial_app_wk1/src/store/application_store.dart';
 import 'package:tutorial_app_wk1/src/store/modules/profile.dart';
 
@@ -33,6 +34,10 @@ class _ContactsActionButton extends StatelessWidget {
 class _ContactsActionBar extends StatelessWidget {
   static const buttonSize = 32.0;
 
+  final Function retrieveContacts;
+
+  _ContactsActionBar({@required this.retrieveContacts});
+
   @override
   Widget build(BuildContext context) => Container(
       margin: EdgeInsets.only(bottom: 24),
@@ -57,7 +62,7 @@ class _ContactsActionBar extends StatelessWidget {
                     tooltipMessage: '디바이스에 저장된 연락처 불러오기',
                     size: buttonSize,
                     iconData: Icons.sync,
-                    onPressed: () {}),
+                    onPressed: retrieveContacts),
                 _ContactsActionButton(
                     tooltipMessage: '연락처 선택',
                     size: buttonSize,
@@ -71,7 +76,8 @@ class _ContactsList extends StatelessWidget {
   _ContactsList({@required this.contacts});
 
   @override
-  Widget build(BuildContext context) => Text(json.encode(this.contacts));
+  Widget build(BuildContext context) => Text(json
+      .encode(this.contacts.map((contact) => contact.displayName).toList()));
 }
 
 class _ContactsProps {
@@ -98,11 +104,32 @@ class _ContactsState extends State<Contacts> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      _ContactsActionBar(),
+                      _ContactsActionBar(
+                          retrieveContacts: _retrieveContacts(props)),
                       Expanded(
                           child: _ContactsList(
                         contacts: props.contacts,
                       ))
                     ]));
           });
+
+  _retrieveContacts(_ContactsProps props) => () async {
+        PermissionStatus status = await Permission.contacts.status;
+
+        switch (status) {
+          case PermissionStatus.undetermined:
+            if (await Permission.contacts.request().isGranted) {
+              props.retrieveContacts();
+            }
+            break;
+          case PermissionStatus.granted:
+            props.retrieveContacts();
+            break;
+          case PermissionStatus.denied:
+          case PermissionStatus.restricted:
+          case PermissionStatus.permanentlyDenied:
+          default:
+            break;
+        }
+      };
 }
