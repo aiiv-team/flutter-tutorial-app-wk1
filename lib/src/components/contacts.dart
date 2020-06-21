@@ -1,4 +1,3 @@
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -33,16 +32,13 @@ class _ContactsActionButton extends StatelessWidget {
 
 class _ContactsSearchTextField extends StatelessWidget {
   final Function onChanged;
-  final TextEditingController _controller;
-  _ContactsSearchTextField({@required this.onChanged})
-      : _controller = TextEditingController();
+  _ContactsSearchTextField({@required this.onChanged});
 
   @override
   Widget build(BuildContext context) => Expanded(
       child: Padding(
           padding: EdgeInsets.symmetric(vertical: 8),
           child: TextField(
-            controller: _controller,
             cursorColor: Colors.black,
             cursorWidth: 1,
             decoration: InputDecoration(
@@ -64,8 +60,11 @@ class _ContactsActionBar extends StatelessWidget {
   static const barSize = 40.0;
 
   final Function retrieveContacts;
+  final Function onSearchTextFieldChanged;
 
-  _ContactsActionBar({@required this.retrieveContacts});
+  _ContactsActionBar(
+      {@required this.retrieveContacts,
+      @required this.onSearchTextFieldChanged});
 
   @override
   Widget build(BuildContext context) => Container(
@@ -91,7 +90,8 @@ class _ContactsActionBar extends StatelessWidget {
                         iconData: Icons.search,
                         onPressed: () {}),
                     SizedBox(width: 8),
-                    _ContactsSearchTextField(onChanged: (String value) {}),
+                    _ContactsSearchTextField(
+                        onChanged: onSearchTextFieldChanged),
                     SizedBox(width: 8),
                     _ContactsActionButton(
                         tooltipMessage: '연락처 추가하기',
@@ -113,7 +113,7 @@ class _ContactsActionBar extends StatelessWidget {
 
 class _ContactsList extends StatelessWidget {
   final FetchState contactsFetchState;
-  final List<Contact> contacts;
+  final List<ContactState> contacts;
   final Function retrieveContacts;
   _ContactsList(
       {@required this.contactsFetchState,
@@ -129,7 +129,7 @@ class _ContactsList extends StatelessWidget {
         return ListView.builder(
           key: PageStorageKey('KEY_CONTACTS_LIST'),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          itemBuilder: (_, i) => ContactItem(contact: contacts[i]),
+          itemBuilder: (_, i) => ContactItem(contactState: contacts[i]),
         );
       case FetchState.PermissionError:
         return Center(child: Text('주소록에 접근할 권한이 없습니다.'));
@@ -156,12 +156,14 @@ class _ContactsList extends StatelessWidget {
 
 class _ContactsProps {
   final FetchState contactsFetchState;
-  final List<Contact> contacts;
+  final List<ContactState> contacts;
   final Function retrieveContacts;
+  final Function onSearchTextFieldChanged;
   _ContactsProps(
       {@required this.contactsFetchState,
       @required this.contacts,
-      @required this.retrieveContacts});
+      @required this.retrieveContacts,
+      @required this.onSearchTextFieldChanged});
 }
 
 class Contacts extends StatefulWidget {
@@ -176,12 +178,16 @@ class _ContactsState extends State<Contacts> {
           converter: (store) => _ContactsProps(
               contactsFetchState: store.state.profile.contactsFetchState,
               contacts: store.state.profile.contacts,
-              retrieveContacts: () => store.dispatch(retrieveContacts())),
+              retrieveContacts: () => store.dispatch(retrieveContacts()),
+              onSearchTextFieldChanged: (String value) =>
+                  store.dispatch(SetContactsSearchAction(searchString: value))),
           builder: (context, props) {
             return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  _ContactsActionBar(retrieveContacts: props.retrieveContacts),
+                  _ContactsActionBar(
+                      retrieveContacts: props.retrieveContacts,
+                      onSearchTextFieldChanged: props.onSearchTextFieldChanged),
                   Expanded(
                       child: _ContactsList(
                     contactsFetchState: props.contactsFetchState,

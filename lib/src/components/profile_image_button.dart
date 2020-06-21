@@ -9,9 +9,8 @@ class _BackgroundContainer extends StatelessWidget {
   final double size;
 
   const _BackgroundContainer({
-    Key key,
     @required this.size,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +48,7 @@ class _BackgroundContainer extends StatelessWidget {
 class _ImageContainer extends StatelessWidget {
   final double size;
   final Widget child;
-  _ImageContainer({Key key, @required this.size, @required this.child})
-      : super(key: key);
+  _ImageContainer({@required this.size, @required this.child});
 
   @override
   Widget build(BuildContext context) => ClipRRect(
@@ -68,7 +66,7 @@ class _ProfileImageButtonProps {
 class ProfileImageButton extends StatelessWidget {
   final double size;
 
-  const ProfileImageButton({Key key, this.size = 96}) : super(key: key);
+  const ProfileImageButton({this.size = 96});
 
   @override
   Widget build(BuildContext context) {

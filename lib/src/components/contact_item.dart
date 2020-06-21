@@ -1,6 +1,6 @@
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:tutorial_app_wk1/src/lib/misc.dart';
+import 'package:tutorial_app_wk1/src/store/modules/profile.dart';
 
 const _contactItemTextStyle = TextStyle(fontSize: 16);
 const _contactItemHeight = 48.0;
@@ -9,8 +9,11 @@ const _contactItemThumbnailSize = 40.0;
 class _ContactItemThumbnail extends StatelessWidget {
   final String displayName;
   final double size;
+  final Color backgroundColor;
   _ContactItemThumbnail(
-      {@required this.displayName, this.size = _contactItemThumbnailSize});
+      {@required this.displayName,
+      @required this.backgroundColor,
+      this.size = _contactItemThumbnailSize});
 
   @override
   Widget build(BuildContext context) => ClipRRect(
@@ -19,7 +22,7 @@ class _ContactItemThumbnail extends StatelessWidget {
           height: size,
           width: size,
           child: Container(
-              decoration: BoxDecoration(color: getRandomColor()),
+              decoration: BoxDecoration(color: backgroundColor),
               child: Center(
                   child: Text(displayName.substring(0, 1),
                       style: const TextStyle(
@@ -27,19 +30,22 @@ class _ContactItemThumbnail extends StatelessWidget {
 }
 
 class ContactItem extends StatelessWidget {
-  final Contact contact;
-  ContactItem({@required this.contact});
+  final ContactState contactState;
+  ContactItem({@required this.contactState});
 
   @override
   Widget build(BuildContext context) => Container(
       height: _contactItemHeight,
       child:
           Row(crossAxisAlignment: CrossAxisAlignment.center, children: <Widget>[
-        _ContactItemThumbnail(displayName: contact.displayName),
+        _ContactItemThumbnail(
+          displayName: contactState.contact.displayName,
+          backgroundColor: contactState.thumbnailBackgroundColor,
+        ),
         SizedBox(width: 8),
-        Text(contact.displayName, style: _contactItemTextStyle),
+        Text(contactState.contact.displayName, style: _contactItemTextStyle),
         Spacer(),
-        Text(formatPhoneNumber(contact.phones.first.value),
+        Text(formatPhoneNumber(contactState.contact.phones.first.value),
             style: _contactItemTextStyle),
       ]));
 }
