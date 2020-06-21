@@ -114,14 +114,24 @@ class _ContactsActionBar extends StatelessWidget {
 class _ContactsList extends StatelessWidget {
   final FetchState contactsFetchState;
   final List<ContactState> contacts;
+  final String searchString;
   final Function retrieveContacts;
   _ContactsList(
       {@required this.contactsFetchState,
       @required this.contacts,
+      @required this.searchString,
       @required this.retrieveContacts});
 
   @override
   Widget build(BuildContext context) {
+    final filteredList = searchString.length == 0
+        ? contacts
+        : contacts
+            .where((contactState) => contactState.contact.displayName
+                .toLowerCase()
+                .contains(searchString.toLowerCase()))
+            .toList();
+
     switch (contactsFetchState) {
       case FetchState.Pending:
         return Center(child: CircularProgressIndicator());
@@ -129,7 +139,10 @@ class _ContactsList extends StatelessWidget {
         return ListView.builder(
           key: PageStorageKey('KEY_CONTACTS_LIST'),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          itemBuilder: (_, i) => ContactItem(contactState: contacts[i]),
+          itemCount: filteredList.length,
+          itemBuilder: (_, i) => ContactItem(
+              key: ValueKey(filteredList[i].contact.displayName),
+              contactState: filteredList[i]),
         );
       case FetchState.PermissionError:
         return Center(child: Text('주소록에 접근할 권한이 없습니다.'));
@@ -157,11 +170,13 @@ class _ContactsList extends StatelessWidget {
 class _ContactsProps {
   final FetchState contactsFetchState;
   final List<ContactState> contacts;
+  final String searchString;
   final Function retrieveContacts;
   final Function onSearchTextFieldChanged;
   _ContactsProps(
       {@required this.contactsFetchState,
       @required this.contacts,
+      @required this.searchString,
       @required this.retrieveContacts,
       @required this.onSearchTextFieldChanged});
 }
@@ -178,6 +193,7 @@ class _ContactsState extends State<Contacts> {
           converter: (store) => _ContactsProps(
               contactsFetchState: store.state.profile.contactsFetchState,
               contacts: store.state.profile.contacts,
+              searchString: store.state.profile.contactsSearch,
               retrieveContacts: () => store.dispatch(retrieveContacts()),
               onSearchTextFieldChanged: (String value) =>
                   store.dispatch(SetContactsSearchAction(searchString: value))),
@@ -192,6 +208,7 @@ class _ContactsState extends State<Contacts> {
                       child: _ContactsList(
                     contactsFetchState: props.contactsFetchState,
                     contacts: props.contacts,
+                    searchString: props.searchString,
                     retrieveContacts: props.retrieveContacts,
                   ))
                 ]);

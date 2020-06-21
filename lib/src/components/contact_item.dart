@@ -31,7 +31,7 @@ class _ContactItemThumbnail extends StatelessWidget {
 
 class ContactItem extends StatelessWidget {
   final ContactState contactState;
-  ContactItem({@required this.contactState});
+  ContactItem({Key key, @required this.contactState}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Container(
