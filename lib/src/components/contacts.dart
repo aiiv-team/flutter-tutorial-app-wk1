@@ -97,7 +97,7 @@ class _ContactsList extends StatelessWidget {
       case FetchState.Success:
         return ListView.builder(
           key: PageStorageKey('KEY_CONTACTS_LIST'),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           itemBuilder: (_, i) => ContactItem(contact: contacts[i]),
         );
       case FetchState.PermissionError:
