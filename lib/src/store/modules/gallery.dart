@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:tutorial_app_wk1/src/lib/misc.dart';
 import 'package:tutorial_app_wk1/src/store/application_store.dart';
+
+const String GALLERY_PATH = '/storage/emulated/0/DCIM';
 
 class RequestGalleryAction {}
 
@@ -30,7 +34,15 @@ class GalleryState {
 }
 
 ThunkAction<RootState> retrieveGalleryImagePaths() {
-  return (Store<RootState> store) async {};
+  return (Store<RootState> store) {
+    final directory = Directory(GALLERY_PATH);
+    final imagePaths = directory
+        .listSync(recursive: true, followLinks: false)
+        .map((file) => file.path)
+        .toList();
+
+    store.dispatch(SetGalleryPathsAction(paths: imagePaths));
+  };
 }
 
 GalleryState galleryReducer(GalleryState state, action) {
