@@ -42,9 +42,6 @@ class _ContactsSearchTextField extends StatelessWidget {
             cursorColor: Colors.black,
             cursorWidth: 1,
             decoration: InputDecoration(
-                border: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                enabledBorder: InputBorder.none,
                 errorBorder: InputBorder.none,
                 disabledBorder: InputBorder.none),
             enableInteractiveSelection: false,
@@ -94,20 +91,10 @@ class _ContactsActionBar extends StatelessWidget {
                         onChanged: onSearchTextFieldChanged),
                     SizedBox(width: 8),
                     _ContactsActionButton(
-                        tooltipMessage: '연락처 추가하기',
-                        size: buttonSize,
-                        iconData: Icons.add,
-                        onPressed: () {}),
-                    _ContactsActionButton(
                         tooltipMessage: '디바이스에 저장된 연락처 불러오기',
                         size: buttonSize,
                         iconData: Icons.sync,
                         onPressed: retrieveContacts),
-                    _ContactsActionButton(
-                        tooltipMessage: '연락처 선택',
-                        size: buttonSize,
-                        iconData: Icons.more_vert,
-                        onPressed: () {}),
                   ]))));
 }
 

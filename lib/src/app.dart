@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:tutorial_app_wk1/src/components/gallery.dart';
 import 'package:tutorial_app_wk1/src/components/profile_page.dart';
 import 'package:tutorial_app_wk1/src/providers/environment_provider.dart';
 import 'package:tutorial_app_wk1/src/store/application_store.dart';
@@ -14,7 +15,7 @@ class _AppState extends State<App> {
   int _selectedPageIndex = 0;
   final List<Widget> _pages = <Widget>[
     ProfilePage(),
-    Text('Gallery'),
+    Gallery(),
   ];
   final List<BottomNavigationBarItem> _navItems = <BottomNavigationBarItem>[
     BottomNavigationBarItem(icon: Icon(Icons.phone), title: Text('연락처')),
