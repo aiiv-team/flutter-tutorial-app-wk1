@@ -1,5 +1,6 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:tutorial_app_wk1/src/components/contact_item.dart';
 import 'package:tutorial_app_wk1/src/lib/misc.dart';
@@ -27,6 +28,34 @@ class _ContactsActionButton extends StatelessWidget {
             padding: EdgeInsets.zero,
             child: Icon(iconData),
             onPressed: onPressed,
+          )));
+}
+
+class _ContactsSearchTextField extends StatelessWidget {
+  final Function onChanged;
+  final TextEditingController _controller;
+  _ContactsSearchTextField({@required this.onChanged})
+      : _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+      child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: TextField(
+            controller: _controller,
+            cursorColor: Colors.black,
+            cursorWidth: 1,
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none),
+            enableInteractiveSelection: false,
+            keyboardType: TextInputType.text,
+            onChanged: onChanged,
+            style: const TextStyle(fontSize: 16),
+            textAlign: TextAlign.left,
           )));
 }
 
@@ -61,7 +90,9 @@ class _ContactsActionBar extends StatelessWidget {
                         size: buttonSize,
                         iconData: Icons.search,
                         onPressed: () {}),
-                    Spacer(),
+                    SizedBox(width: 8),
+                    _ContactsSearchTextField(onChanged: (String value) {}),
+                    SizedBox(width: 8),
                     _ContactsActionButton(
                         tooltipMessage: '연락처 추가하기',
                         size: buttonSize,

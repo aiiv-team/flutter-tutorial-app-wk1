@@ -56,7 +56,7 @@ class _MyProfileNameTextField extends StatelessWidget {
         controller: _controller,
         cursorColor: Colors.black,
         cursorWidth: 1,
-        decoration: new InputDecoration(
+        decoration: InputDecoration(
             border: InputBorder.none,
             focusedBorder: InputBorder.none,
             enabledBorder: InputBorder.none,

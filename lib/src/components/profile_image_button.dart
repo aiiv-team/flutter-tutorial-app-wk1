@@ -68,7 +68,7 @@ class _ProfileImageButtonProps {
 class ProfileImageButton extends StatelessWidget {
   final double size;
 
-  const ProfileImageButton({Key key, this.size = 80}) : super(key: key);
+  const ProfileImageButton({Key key, this.size = 96}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,7 @@ class ProfileImageButton extends StatelessWidget {
               ? _ImageContainer(
                   size: size,
                   child: FittedBox(
-                      fit: BoxFit.fill,
+                      fit: BoxFit.cover,
                       child: Image.file(File(props.profileImagePath))))
               : Stack(
                   alignment: AlignmentDirectional.center,
