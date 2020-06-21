@@ -95,10 +95,10 @@ class _ContactsList extends StatelessWidget {
       case FetchState.Pending:
         return Center(child: CircularProgressIndicator());
       case FetchState.Success:
-        return ListView(
+        return ListView.builder(
+          key: PageStorageKey('KEY_CONTACTS_LIST'),
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          children:
-              contacts.map((contact) => ContactItem(contact: contact)).toList(),
+          itemBuilder: (_, i) => ContactItem(contact: contacts[i]),
         );
       case FetchState.PermissionError:
         return Center(child: Text('주소록에 접근할 권한이 없습니다.'));
