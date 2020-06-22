@@ -109,6 +109,9 @@ ThunkAction<RootState> pickProfileImage() {
     }
 
     final pickedFile = await _picker.getImage(source: ImageSource.gallery);
+    if (pickedFile == null) {
+      return;
+    }
     store.dispatch(SetProfileImageAction(profileImagePath: pickedFile.path));
   };
 }

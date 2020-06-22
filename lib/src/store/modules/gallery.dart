@@ -7,6 +7,7 @@ import 'package:tutorial_app_wk1/src/lib/misc.dart';
 import 'package:tutorial_app_wk1/src/store/application_store.dart';
 
 const String GALLERY_PATH = '/storage/emulated/0/DCIM';
+const String REGEX_IMAGE = r"[\/.](gif|jpg|jpeg|tiff|png)";
 
 class RequestGalleryAction {}
 
@@ -35,10 +36,13 @@ class GalleryState {
 
 ThunkAction<RootState> retrieveGalleryImagePaths() {
   return (Store<RootState> store) {
+    final imageRegex = RegExp(REGEX_IMAGE);
+
     final directory = Directory(GALLERY_PATH);
     final imagePaths = directory
         .listSync(recursive: true, followLinks: false)
         .map((file) => file.path)
+        .where((path) => imageRegex.firstMatch(path) != null)
         .toList();
 
     store.dispatch(SetGalleryPathsAction(paths: imagePaths));
