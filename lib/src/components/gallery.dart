@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:tutorial_app_wk1/src/lib/image.dart';
@@ -8,70 +10,54 @@ import 'package:tutorial_app_wk1/src/store/application_store.dart';
 import 'package:tutorial_app_wk1/src/store/modules/gallery.dart';
 
 class _ImageGridItem extends StatefulWidget {
+  final int idx;
   final String imagePath;
-  _ImageGridItem({@required this.imagePath});
+  _ImageGridItem({@required this.idx, @required this.imagePath});
 
   @override
   _ImageGridItemState createState() => _ImageGridItemState();
 }
 
-enum _ImageLoadProgress { None, Pending, Success }
-
 class _ImageGridItemState extends State<_ImageGridItem> {
-  _ImageLoadProgress progress;
   Uint8List imageByteData;
+  Future<Uint8List> _loadFuture;
 
   static final _progressAnimationColor =
       AlwaysStoppedAnimation<Color>(Colors.black.withAlpha(0x20));
   static final _backgroundColor = Colors.black.withAlpha((0x08));
-  static const _thumbnailWidth = 256;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _loadFuture = _load();
   }
 
   @override
-  Widget build(BuildContext context) {
-    switch (progress) {
-      case _ImageLoadProgress.Success:
-        return FittedBox(fit: BoxFit.cover, child: Image.memory(imageByteData));
-      case _ImageLoadProgress.None:
-      case _ImageLoadProgress.Pending:
-      default:
-        return Container(
+  Widget build(BuildContext context) => FutureBuilder(
+      future: _loadFuture,
+      builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
+        if (snapshot.hasData == false) {
+          return Container(
+              decoration: BoxDecoration(color: _backgroundColor),
+              child: Center(
+                  child: SizedBox(
+                      width: 16.0,
+                      height: 16.0,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: _progressAnimationColor,
+                      ))));
+        } else if (snapshot.hasError) {
+          return Container(
             decoration: BoxDecoration(color: _backgroundColor),
-            child: Center(
-                child: SizedBox(
-                    width: 16.0,
-                    height: 16.0,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: _progressAnimationColor,
-                    ))));
-    }
-  }
+          );
+        } else {
+          return FittedBox(
+              fit: BoxFit.cover, child: Image.memory(snapshot.data));
+        }
+      });
 
-  void _setProgress(_ImageLoadProgress _progress) {
-    setState(() {
-      progress = _progress;
-    });
-  }
-
-  void _setByteData(Uint8List byteData) {
-    setState(() {
-      imageByteData = byteData;
-    });
-  }
-
-  Future<void> _load() async {
-    _setProgress(_ImageLoadProgress.Pending);
-    await loadThumbnail(widget.imagePath, _thumbnailWidth).then((thumbnail) {
-      _setByteData(thumbnail);
-      _setProgress(_ImageLoadProgress.Success);
-    });
-  }
+  Future<Uint8List> _load() => compute(loadImage, widget.imagePath);
 }
 
 class _ImageGrid extends StatelessWidget {
@@ -94,13 +80,13 @@ class _ImageGrid extends StatelessWidget {
             child: CustomScrollView(slivers: <Widget>[
               SliverGrid(
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 120.0,
+                    maxCrossAxisExtent: 180.0,
                     mainAxisSpacing: 4.0,
                     crossAxisSpacing: 4.0,
                   ),
                   delegate: SliverChildBuilderDelegate(
                       (context, idx) =>
-                          _ImageGridItem(imagePath: imagePaths[idx]),
+                          _ImageGridItem(idx: idx, imagePath: imagePaths[idx]),
                       childCount: imagePaths.length))
             ]));
       case FetchState.None:
